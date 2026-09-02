@@ -1,0 +1,88 @@
+{% extends "forms/base.html" %}
+{% block form_title %}Monograph Defense Result Sheet{% endblock %}
+
+{% block extra_style %}
+<style>
+  table.scores { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+  table.scores th, table.scores td {
+    border: 1px solid #999; padding: 7px 9px; text-align: left;
+  }
+  table.scores th { background: #f2f2f2; }
+  table.scores td.score { text-align: center; font-weight: bold; width: 15%; }
+  .final-grade {
+    margin-top: 14px; padding: 12px; border: 2px solid #111;
+    text-align: center; font-size: 13pt;
+  }
+  .final-grade .value { font-size: 20pt; font-weight: bold; }
+</style>
+{% endblock %}
+
+{% block content %}
+<table class="fields">
+  <tr><th>Student{{ students|pluralize }}</th><td>{{ student_names }}</td></tr>
+  <tr><th>Student ID{{ students|pluralize }}</th><td>{{ student_ids }}</td></tr>
+  <tr><th>Monograph Title</th><td><strong>{{ title }}</strong></td></tr>
+  <tr><th>Supervisor</th><td>{{ supervisor }}</td></tr>
+  <tr><th>Defense Held On</th><td>{{ held_at }}</td></tr>
+  <tr><th>Location</th><td>{{ location }}</td></tr>
+</table>
+
+<div class="section-title">Committee Scores</div>
+<table class="scores">
+  <tr><th style="width:8%">#</th><th>Name</th><th>Role</th><th class="score">Score</th></tr>
+  {% for member in committee %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ member.name }}</td>
+    <td>{{ member.role }}</td>
+    <td class="score">{{ member.score|default:"—" }}</td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <td colspan="3" style="text-align:right"><strong>Committee Average</strong></td>
+    <td class="score">{{ committee_average|default:"—" }}</td>
+  </tr>
+  {% if supervisor_score %}
+  <tr>
+    <td colspan="3" style="text-align:right">
+      <strong>Supervisor Assessment</strong> ({{ supervisor_weight }}%)
+    </td>
+    <td class="score">{{ supervisor_score }}</td>
+  </tr>
+  {% endif %}
+</table>
+
+<div class="final-grade">
+  Final Grade<br>
+  <span class="value">{{ final_grade|default:"—" }}</span><br>
+  <span>Result: <strong>{{ result }}</strong></span>
+</div>
+
+{% if required_revisions %}
+<div class="section-title">Required Revisions</div>
+<div class="body-text">{{ required_revisions }}</div>
+{% if revisions_due_date %}
+<div class="body-text"><strong>Due by: {{ revisions_due_date }}</strong></div>
+{% endif %}
+{% endif %}
+
+{% if notes %}
+<div class="section-title">Committee Remarks</div>
+<div class="body-text">{{ notes }}</div>
+{% endif %}
+{% endblock %}
+
+{% block signatures %}
+<div class="signatures">
+  {% for member in committee %}
+  {% if forloop.counter0|divisibleby:2 %}<div class="signature-row">{% endif %}
+    <div class="signature-block">
+      <div class="signature-line"></div>
+      <div class="signature-name">{{ member.name }}</div>
+      <div class="signature-label">{{ member.role }}</div>
+    </div>
+  {% if forloop.counter|divisibleby:2 or forloop.last %}</div>{% endif %}
+  {% endfor %}
+  <div class="stamp-box">Department Stamp</div>
+</div>
+{% endblock %}

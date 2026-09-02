@@ -1,0 +1,43 @@
+{% extends "forms/base.html" %}
+{% block form_title %}Supervisor Assignment Letter{% endblock %}
+
+{% block content %}
+<div class="body-text">
+  To: <strong>{{ supervisor }}</strong>
+</div>
+
+<div class="body-text">
+  You are hereby appointed as supervisor for the monograph described below.
+  You are asked to guide the student{{ students|pluralize }} through the
+  research, review submitted work within {{ response_days }} days of receiving
+  it, and confirm when the monograph is ready to be defended.
+</div>
+
+<table class="fields">
+  <tr><th>Student{{ students|pluralize }}</th><td>{{ student_names }}</td></tr>
+  <tr><th>Student ID{{ students|pluralize }}</th><td>{{ student_ids }}</td></tr>
+  <tr><th>Monograph Title</th><td><strong>{{ title }}</strong></td></tr>
+  <tr><th>Research Area</th><td>{{ research_area }}</td></tr>
+  <tr><th>Academic Year</th><td>{{ academic_year }}</td></tr>
+  <tr><th>Assigned On</th><td>{{ assigned_on }}</td></tr>
+  <tr><th>Current Supervision Load</th><td>{{ current_load }} student{{ current_load|pluralize }}</td></tr>
+</table>
+{% endblock %}
+
+{% block signatures %}
+<div class="signatures">
+  <div class="signature-row">
+    <div class="signature-block">
+      <div class="signature-line"></div>
+      <div class="signature-name">{{ supervisor }}</div>
+      <div class="signature-label">Supervisor — accepted</div>
+    </div>
+    <div class="signature-block">
+      <div class="signature-line"></div>
+      <div class="signature-name">{{ head_of_department }}</div>
+      <div class="signature-label">Head of Department</div>
+    </div>
+  </div>
+  <div class="stamp-box">Department Stamp</div>
+</div>
+{% endblock %}

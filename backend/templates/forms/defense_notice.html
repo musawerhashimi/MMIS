@@ -1,0 +1,50 @@
+{% extends "forms/base.html" %}
+{% block form_title %}Notice of Monograph Defense{% endblock %}
+
+{% block content %}
+<div class="body-text">
+  The department announces the public defense of the monograph described
+  below. Committee members are asked to read the monograph before the defense
+  date.
+</div>
+
+<table class="fields">
+  <tr><th>Student{{ students|pluralize }}</th><td>{{ student_names }}</td></tr>
+  <tr><th>Monograph Title</th><td><strong>{{ title }}</strong></td></tr>
+  <tr><th>Supervisor</th><td>{{ supervisor }}</td></tr>
+  <tr><th>Date and Time</th><td><strong>{{ scheduled_at }}</strong></td></tr>
+  <tr><th>Location</th><td>{{ location }}</td></tr>
+  <tr><th>Duration</th><td>{{ duration }} minutes</td></tr>
+</table>
+
+<div class="section-title">Defense Committee</div>
+<table class="fields">
+  <tr>
+    <th style="width:8%">#</th>
+    <th style="width:47%">Name</th>
+    <th style="width:45%">Role</th>
+  </tr>
+  {% for member in committee %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ member.name }}</td>
+    <td>{{ member.role }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}
+
+{% block signatures %}
+<div class="signatures">
+  <div class="signature-row">
+    <div class="signature-block">
+      <div class="signature-line"></div>
+      <div class="signature-name">{{ head_of_department }}</div>
+      <div class="signature-label">Head of Department</div>
+    </div>
+    <div class="signature-block">
+      <div class="stamp-box">Department Stamp</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

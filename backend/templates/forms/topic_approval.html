@@ -1,0 +1,52 @@
+{% extends "forms/base.html" %}
+{% block form_title %}Monograph Topic Approval Form{% endblock %}
+
+{% block content %}
+<table class="fields">
+  <tr><th>Student{{ students|pluralize }}</th><td>{{ student_names }}</td></tr>
+  <tr><th>Student ID{{ students|pluralize }}</th><td>{{ student_ids }}</td></tr>
+  <tr><th>Academic Year</th><td>{{ academic_year }}</td></tr>
+  <tr><th>Research Area</th><td>{{ research_area }}</td></tr>
+  <tr><th>Proposed Title</th><td><strong>{{ title }}</strong></td></tr>
+  <tr><th>Supervisor</th><td>{{ supervisor }}</td></tr>
+</table>
+
+{% if abstract %}
+<div class="section-title">Abstract</div>
+<div class="body-text">{{ abstract }}</div>
+{% endif %}
+
+{% if objectives %}
+<div class="section-title">Objectives</div>
+<div class="body-text">{{ objectives }}</div>
+{% endif %}
+
+{% if methodology %}
+<div class="section-title">Methodology</div>
+<div class="body-text">{{ methodology }}</div>
+{% endif %}
+
+<div class="section-title">Decision</div>
+<table class="fields">
+  <tr><th>Status</th><td>{{ decision }}</td></tr>
+  <tr><th>Approved On</th><td>{{ approved_on }}</td></tr>
+</table>
+{% endblock %}
+
+{% block signatures %}
+<div class="signatures">
+  <div class="signature-row">
+    <div class="signature-block">
+      <div class="signature-line"></div>
+      <div class="signature-name">{{ supervisor }}</div>
+      <div class="signature-label">Supervisor</div>
+    </div>
+    <div class="signature-block">
+      <div class="signature-line"></div>
+      <div class="signature-name">{{ head_of_department }}</div>
+      <div class="signature-label">Head of Department</div>
+    </div>
+  </div>
+  <div class="stamp-box">Department Stamp</div>
+</div>
+{% endblock %}

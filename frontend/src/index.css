@@ -1,0 +1,170 @@
+@import "tailwindcss";
+
+/*
+  Design tokens.
+
+  One accent colour carries the brand; everything else is neutral so the
+  interface stays calm while a student reads feedback or a head of department
+  scans thirty rows. Stage colours are semantic — they mean the same thing on
+  a chart, a badge and a timeline.
+*/
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Brand: a deep academic blue. */
+  --color-brand-50:  oklch(0.971 0.014 254);
+  --color-brand-100: oklch(0.932 0.032 255);
+  --color-brand-200: oklch(0.882 0.059 254);
+  --color-brand-300: oklch(0.809 0.105 252);
+  --color-brand-400: oklch(0.707 0.165 254);
+  --color-brand-500: oklch(0.623 0.214 259);
+  --color-brand-600: oklch(0.546 0.245 262);
+  --color-brand-700: oklch(0.488 0.243 264);
+  --color-brand-800: oklch(0.424 0.199 265);
+  --color-brand-900: oklch(0.379 0.146 265);
+  --color-brand-950: oklch(0.282 0.091 267);
+
+  /* Stage semantics, used by charts, badges and the timeline alike. */
+  --color-stage-draft:     oklch(0.708 0.010 256);
+  --color-stage-pending:   oklch(0.769 0.144 70);
+  --color-stage-review:    oklch(0.707 0.165 254);
+  --color-stage-revision:  oklch(0.705 0.183 47);
+  --color-stage-approved:  oklch(0.723 0.184 150);
+  --color-stage-defense:   oklch(0.702 0.183 294);
+  --color-stage-complete:  oklch(0.627 0.194 150);
+  --color-stage-rejected:  oklch(0.637 0.237 25);
+  --color-stage-withdrawn: oklch(0.554 0.020 256);
+
+  --radius-card: 0.75rem;
+}
+
+/*
+  Light and dark are both first-class. Staff often work in bright offices and
+  students read on phones at night, so neither is an afterthought.
+*/
+:root {
+  --surface:        oklch(0.995 0 0);
+  --surface-raised: oklch(1 0 0);
+  --surface-sunken: oklch(0.972 0.002 250);
+  --border:         oklch(0.916 0.004 250);
+  --border-strong:  oklch(0.851 0.006 250);
+  --text:           oklch(0.211 0.012 254);
+  --text-muted:     oklch(0.512 0.014 254);
+  --text-subtle:    oklch(0.629 0.012 254);
+  --ring:           oklch(0.623 0.214 259);
+  --shadow-color:   220 40% 12%;
+}
+
+.dark {
+  --surface:        oklch(0.184 0.011 258);
+  --surface-raised: oklch(0.223 0.014 258);
+  --surface-sunken: oklch(0.152 0.010 258);
+  --border:         oklch(0.301 0.017 257);
+  --border-strong:  oklch(0.372 0.021 257);
+  --text:           oklch(0.972 0.003 250);
+  --text-muted:     oklch(0.727 0.012 254);
+  --text-subtle:    oklch(0.596 0.014 254);
+  --ring:           oklch(0.707 0.165 254);
+  --shadow-color:   220 60% 2%;
+}
+
+@layer base {
+  /* Default border colour, applied at low specificity so any explicit
+     Tailwind border-<colour> utility still wins. */
+  *,
+  ::before,
+  ::after {
+    border-color: color-mix(in srgb, var(--border) 100%, transparent);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--surface);
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* A visible focus ring is the only way keyboard users can navigate a form
+     this long, so it is never removed — only shaped. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-200);
+    color: var(--color-brand-950);
+  }
+
+  /* Scrollbars styled to disappear into the surface rather than interrupt it. */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+    border: 2px solid var(--surface);
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-subtle); }
+}
+
+@layer components {
+  .surface {
+    background-color: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+  }
+
+  .surface-sunken {
+    background-color: var(--surface-sunken);
+  }
+
+  .text-muted { color: var(--text-muted); }
+  .text-subtle { color: var(--text-subtle); }
+
+  /* Used while data loads. Kept subtle: an aggressive shimmer on a slow
+     connection reads as the page being broken. */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--surface-sunken) 25%,
+      var(--border) 37%,
+      var(--surface-sunken) 63%
+    );
+    background-size: 400% 100%;
+    animation: skeleton-sweep 1.4s ease-in-out infinite;
+    border-radius: 0.375rem;
+  }
+
+  @keyframes skeleton-sweep {
+    0%   { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+  }
+
+  .animate-in {
+    animation: fade-rise 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes fade-rise {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: none; }
+  }
+}
+
+/* Respect a reader's stated preference for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; color: black; }
+}
