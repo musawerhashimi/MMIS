@@ -1,0 +1,74 @@
+# Runs on every push. Catches the things that are easy to break and hard to
+# notice: a migration nobody generated, a test that stopped passing, a type
+# error that only shows up in a real build.
+
+name: checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install system libraries
+        # WeasyPrint renders the official forms and needs these; without them
+        # the PDF tests fail in a way that looks like a code problem.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b
+
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Check for missing migrations
+        working-directory: backend
+        run: python manage.py makemigrations --check --dry-run
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.test
+
+      - name: Run the tests
+        working-directory: backend
+        run: python -m pytest -q
+
+      - name: Deployment checklist
+        working-directory: backend
+        run: python manage.py check --deploy --fail-level ERROR
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.prod
+          SECRET_KEY: a-key-used-only-by-this-check-not-a-real-secret-value
+          ALLOWED_HOSTS: example.edu
+          SECURE_SSL_REDIRECT: "True"
+
+  frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Check the types
+        working-directory: frontend
+        run: npx tsc -b --noEmit
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build
