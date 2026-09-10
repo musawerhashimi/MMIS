@@ -11,20 +11,59 @@ import type { ApiError } from '@/types'
 const ACCESS_KEY = 'mms.access'
 const REFRESH_KEY = 'mms.refresh'
 
+/**
+ * Where the session is kept.
+ *
+ * sessionStorage rather than localStorage, so each browser tab holds its own
+ * login. A supervisor and a student can be signed in side by side, which is
+ * how staff actually work when helping someone, and how the system gets
+ * tested at all.
+ *
+ * The cost is that closing a tab ends that tab's session. That is the right
+ * trade on shared university computers, where the next person to sit down
+ * should not inherit whoever was there before.
+ *
+ * Some browsers throw on access in private mode, so every call is guarded
+ * and the app falls back to being signed out rather than failing to load.
+ */
+function read(key: string): string | null {
+  try {
+    return sessionStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+function write(key: string, value: string): void {
+  try {
+    sessionStorage.setItem(key, value)
+  } catch {
+    // Nothing to do — the person stays signed in for this page only.
+  }
+}
+
+function remove(key: string): void {
+  try {
+    sessionStorage.removeItem(key)
+  } catch {
+    // Already gone as far as this tab is concerned.
+  }
+}
+
 export const tokens = {
   get access() {
-    return localStorage.getItem(ACCESS_KEY)
+    return read(ACCESS_KEY)
   },
   get refresh() {
-    return localStorage.getItem(REFRESH_KEY)
+    return read(REFRESH_KEY)
   },
   set(access: string, refresh?: string) {
-    localStorage.setItem(ACCESS_KEY, access)
-    if (refresh) localStorage.setItem(REFRESH_KEY, refresh)
+    write(ACCESS_KEY, access)
+    if (refresh) write(REFRESH_KEY, refresh)
   },
   clear() {
-    localStorage.removeItem(ACCESS_KEY)
-    localStorage.removeItem(REFRESH_KEY)
+    remove(ACCESS_KEY)
+    remove(REFRESH_KEY)
   },
 }
 
