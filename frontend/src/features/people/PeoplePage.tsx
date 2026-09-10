@@ -182,6 +182,12 @@ export function PeoplePage() {
   )
 }
 
+interface DepartmentOption {
+  id: string
+  name: string
+  code: string
+}
+
 function CreatePersonDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const me = useAuth((s) => s.user)
   const [form, setForm] = useState({
@@ -193,15 +199,29 @@ function CreatePersonDialog({ open, onClose }: { open: boolean; onClose: () => v
     role: 'student',
     password: '',
     student_id: '',
+    department: me?.department ?? '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const queryClient = useQueryClient()
+
+  // Asked for rather than copied from whoever is signed in: an administrator
+  // who belongs to no department would otherwise create accounts that belong
+  // to none either, and those accounts cannot do anything.
+  const { data: departments } = useQuery({
+    queryKey: ['departments', 'options'],
+    queryFn: async () => {
+      const { data } = await api.get<{ results: DepartmentOption[] }>(
+        '/organization/departments/',
+      )
+      return data.results
+    },
+    enabled: open,
+  })
 
   const create = useMutation({
     mutationFn: () =>
       api.post('/auth/users/', {
         ...form,
-        department: me?.department,
         student_id: form.role === 'student' ? form.student_id : undefined,
       }),
     onSuccess: () => {
@@ -210,6 +230,7 @@ function CreatePersonDialog({ open, onClose }: { open: boolean; onClose: () => v
       setForm({
         username: '', full_name: '', title: '', email: '', phone: '',
         role: 'student', password: '', student_id: '',
+        department: me?.department ?? '',
       })
       onClose()
     },
@@ -234,7 +255,16 @@ function CreatePersonDialog({ open, onClose }: { open: boolean; onClose: () => v
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={() => create.mutate()} loading={create.isPending}>
+          <Button
+            onClick={() => {
+              if (!form.department) {
+                setErrors({ department: 'Choose a department for this person.' })
+                return
+              }
+              create.mutate()
+            }}
+            loading={create.isPending}
+          >
             Create account
           </Button>
         </>
@@ -258,6 +288,22 @@ function CreatePersonDialog({ open, onClose }: { open: boolean; onClose: () => v
             ))}
           </Select>
         </div>
+
+        <Select
+          label="Department"
+          required
+          value={form.department}
+          onChange={(e) => set('department', e.target.value)}
+          error={errors.department}
+          hint="Without one, this person cannot propose or supervise anything."
+        >
+          <option value="">Choose a department</option>
+          {departments?.map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.name}
+            </option>
+          ))}
+        </Select>
 
         <div className="grid gap-4 sm:grid-cols-3">
           <Input

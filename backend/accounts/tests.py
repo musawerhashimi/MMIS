@@ -84,3 +84,37 @@ class TestSupervisorCapacity:
         profile.max_students = None
         profile.save()
         assert profile.effective_max_students == 10  # falls back to the department
+
+
+@pytest.mark.django_db
+class TestCreatingAnAccount:
+    def test_an_account_needs_a_department(self, as_user, admin_user):
+        """
+        An account with no department cannot propose, supervise or approve
+        anything, and nothing on screen explains why. Refuse it at creation
+        rather than leaving someone with an account that does not work.
+        """
+        response = as_user(admin_user).post(
+            "/api/v1/auth/users/",
+            {
+                "username": "stu500", "full_name": "New Student", "role": "student",
+                "student_id": "CS-2021-500", "password": "TestPass123!",
+            },
+            format="json",
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "department" in str(response.data).lower()
+
+    def test_the_same_account_is_accepted_with_one(
+        self, as_user, admin_user, department
+    ):
+        response = as_user(admin_user).post(
+            "/api/v1/auth/users/",
+            {
+                "username": "stu501", "full_name": "New Student", "role": "student",
+                "student_id": "CS-2021-501", "password": "TestPass123!",
+                "department": str(department.id),
+            },
+            format="json",
+        )
+        assert response.status_code == status.HTTP_201_CREATED

@@ -120,6 +120,15 @@ class UserCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"student_id": "A student ID is required for student accounts."}
             )
+
+        # An account with no department cannot propose, supervise or approve
+        # anything — every one of those is scoped to a department. Creating
+        # one silently leaves a person unable to use the system at all, with
+        # nothing to explain why, so refuse it here.
+        if not attrs.get("department"):
+            raise serializers.ValidationError(
+                {"department": "Choose a department. Without one this account cannot be used."}
+            )
         return attrs
 
     def create(self, validated_data):
