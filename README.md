@@ -86,7 +86,11 @@ required* may repeat as many times as needed; every round is kept.
 
 For development, see [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 For installing it at a university, see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
-For the people who will use it, see [docs/USER-GUIDE.md](docs/USER-GUIDE.md).
+For the people who will use it, see [docs/USER-GUIDE.md](docs/USER-GUIDE.md),
+or hand them the printable handbook at
+[docs/Monograph-System-Handbook.pdf](docs/Monograph-System-Handbook.pdf)
+(rebuild it with `python manage.py build_handbook` after editing
+`docs/handbook-print.html`).
 
 Quick start, with nothing installed but Python and Node:
 

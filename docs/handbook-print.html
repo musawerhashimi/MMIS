@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Monograph System — Handbook</title>
+<style>
+  /* ---------------------------------------------------------------
+     Print layout for the handbook. A4, one reading column, every
+     role beginning on its own page so a department can hand out the
+     relevant pages on their own.
+     --------------------------------------------------------------- */
+
+  @page {
+    size: A4;
+    margin: 20mm 18mm 18mm 18mm;
+    @top-right {
+      content: "The Monograph System";
+      font-family: "DejaVu Sans", sans-serif;
+      font-size: 7.5pt;
+      color: #7a8a90;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 6mm;
+    }
+    @bottom-center {
+      content: counter(page);
+      font-family: "DejaVu Sans Mono", monospace;
+      font-size: 8pt;
+      color: #7a8a90;
+      margin-top: 6mm;
+    }
+  }
+
+  /* The cover carries no running header. */
+  @page :first {
+    margin: 0;
+    @top-right { content: ""; }
+    @bottom-center { content: ""; }
+  }
+
+  :root {
+    --ink:       #10272e;
+    --ink-soft:  #4a5c62;
+    --ink-faint: #7a8a90;
+    --rule:      #d8e1e4;
+    --rule-firm: #b6c4c9;
+    --sunken:    #f0f5f6;
+    --accent:    #0d5f6b;
+
+    --wait:   #b06d06;
+    --active: #1d5fc4;
+    --revise: #c25410;
+    --done:   #17703f;
+    --defend: #6a3fb5;
+    --stop:   #b32626;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: "DejaVu Serif", Georgia, serif;
+    font-size: 9.6pt;
+    line-height: 1.55;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  h1, h2, h3, .label, .actor, .where, th, .pip, .num {
+    font-family: "DejaVu Sans", sans-serif;
+  }
+
+  p { margin: 0 0 6pt; }
+
+  /* ---------------- cover ---------------- */
+  .cover {
+    height: 297mm;
+    padding: 45mm 22mm 20mm;
+    page-break-after: always;
+    position: relative;
+  }
+  .cover .kicker {
+    font-family: "DejaVu Sans", sans-serif;
+    font-size: 8pt;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10mm;
+  }
+  .cover h1 {
+    font-family: "DejaVu Serif", serif;
+    font-size: 34pt;
+    line-height: 1.1;
+    font-weight: normal;
+    margin: 0 0 8mm;
+    color: var(--ink);
+  }
+  .cover .lede {
+    font-size: 11.5pt;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    max-width: 118mm;
+    margin: 0 0 14mm;
+  }
+  .cover hr {
+    border: none;
+    border-top: 1.5pt solid var(--ink);
+    margin: 0 0 6mm;
+  }
+  .cover .who {
+    font-family: "DejaVu Sans", sans-serif;
+    font-size: 8.5pt;
+    color: var(--ink-soft);
+    line-height: 1.9;
+  }
+  .cover .who b { color: var(--ink); }
+  .cover .foot {
+    position: absolute;
+    bottom: 20mm;
+    left: 22mm;
+    right: 22mm;
+    font-family: "DejaVu Sans", sans-serif;
+    font-size: 7.5pt;
+    color: var(--ink-faint);
+    border-top: 0.5pt solid var(--rule);
+    padding-top: 3mm;
+  }
+
+  /* ---------------- sections ---------------- */
+  .section { page-break-before: always; }
+  .section.tight { page-break-before: auto; }
+
+  .label {
+    font-size: 7.5pt;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 3mm;
+  }
+  h2 {
+    font-family: "DejaVu Serif", serif;
+    font-size: 17pt;
+    font-weight: normal;
+    line-height: 1.2;
+    margin: 0 0 3mm;
+    padding-bottom: 3mm;
+    border-bottom: 1pt solid var(--ink);
+  }
+  .intro {
+    font-size: 10pt;
+    color: var(--ink-soft);
+    max-width: 130mm;
+    margin: 0 0 7mm;
+  }
+  h3 {
+    font-size: 10pt;
+    font-weight: bold;
+    margin: 0 0 2mm;
+    page-break-after: avoid;
+  }
+
+  /* ---------------- sign in ---------------- */
+  .signin {
+    border: 0.75pt solid var(--rule-firm);
+    border-radius: 2mm;
+    overflow: hidden;
+    margin-bottom: 6mm;
+  }
+  .signin-row {
+    padding: 3.5mm 5mm;
+    border-bottom: 0.5pt solid var(--rule);
+  }
+  .signin-row:last-child { border-bottom: none; }
+  .signin-row dt {
+    font-family: "DejaVu Sans", sans-serif;
+    font-size: 7.5pt;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 1mm;
+  }
+  .signin-row dd { margin: 0; font-weight: bold; font-size: 9.5pt; }
+  .signin-row dd span {
+    display: block;
+    font-weight: normal;
+    color: var(--ink-soft);
+    font-size: 9pt;
+    margin-top: 1mm;
+  }
+
+  /* ---------------- journey ---------------- */
+  .stage {
+    page-break-inside: avoid;
+    margin-bottom: 3.5mm;
+    padding-left: 12mm;
+    position: relative;
+    min-height: 8mm;
+  }
+  .pip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 8mm;
+    height: 8mm;
+    border: 1pt solid currentColor;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 7.4mm;
+    font-size: 8pt;
+  }
+  .stage-name {
+    font-family: "DejaVu Sans", sans-serif;
+    font-weight: bold;
+    font-size: 9.5pt;
+    color: var(--ink);
+    margin: 0.5mm 0 1mm;
+  }
+  .stage-meta {
+    font-size: 9pt;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+  .actor {
+    font-size: 7.5pt;
+    letter-spacing: 0.04em;
+    background: var(--sunken);
+    color: var(--ink);
+    padding: 0.4mm 1.6mm;
+    border-radius: 1mm;
+  }
+  .needs { font-style: italic; color: var(--ink-faint); }
+
+  .loopnote {
+    margin: 2mm 0 2mm 12mm;
+    padding: 3mm 4mm;
+    border-left: 1.2pt solid var(--revise);
+    background: var(--sunken);
+    font-size: 8.8pt;
+    color: var(--ink-soft);
+    page-break-inside: avoid;
+  }
+  .loopnote b { color: var(--ink); }
+
+  .endings {
+    margin-top: 5mm;
+    padding-top: 4mm;
+    border-top: 0.5pt solid var(--rule);
+    page-break-inside: avoid;
+  }
+  .ending {
+    border-left: 1.2pt solid var(--stop);
+    padding: 0 0 0 4mm;
+    margin-bottom: 3.5mm;
+  }
+  .ending h3 { margin-bottom: 1mm; font-size: 9pt; }
+  .ending p { font-size: 8.8pt; color: var(--ink-soft); margin: 0; }
+
+  /* ---------------- tasks ---------------- */
+  .task {
+    border-top: 0.5pt solid var(--rule);
+    padding: 4mm 0;
+    page-break-inside: avoid;
+  }
+  .where {
+    display: inline-block;
+    font-size: 7.5pt;
+    font-weight: normal;
+    color: var(--accent);
+    background: #e6f0f1;
+    padding: 0.5mm 1.8mm;
+    border-radius: 1mm;
+    margin-left: 1.5mm;
+  }
+  .task p { font-size: 9.2pt; color: var(--ink-soft); }
+  .task p b, .task b { color: var(--ink); }
+  .task ol, .task ul { margin: 0 0 4pt; padding-left: 5mm; }
+  .task li { font-size: 9.2pt; color: var(--ink-soft); margin-bottom: 1.2mm; }
+
+  .aside {
+    margin-top: 2.5mm;
+    padding: 3mm 4mm;
+    background: var(--sunken);
+    border-radius: 1.5mm;
+    font-size: 8.8pt;
+    color: var(--ink-soft);
+    page-break-inside: avoid;
+  }
+  .aside b { color: var(--ink); }
+
+  .decision {
+    border-left: 1.2pt solid currentColor;
+    padding-left: 4mm;
+    margin-bottom: 3mm;
+    page-break-inside: avoid;
+  }
+  .decision b {
+    display: block;
+    font-family: "DejaVu Sans", sans-serif;
+    font-size: 9pt;
+    color: var(--ink);
+    margin-bottom: 0.8mm;
+  }
+  .decision span { font-size: 8.8pt; color: var(--ink-soft); }
+
+  /* ---------------- questions ---------------- */
+  .qa { page-break-inside: avoid; margin-bottom: 4mm; }
+  .qa h3 { font-size: 9.5pt; margin-bottom: 1.5mm; }
+  .qa p { font-size: 9.2pt; color: var(--ink-soft); margin: 0; }
+
+  /* ---------------- table ---------------- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+  }
+  th {
+    font-size: 7.5pt;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: normal;
+    text-align: left;
+    padding: 0 4mm 2mm 0;
+    border-bottom: 0.75pt solid var(--rule-firm);
+  }
+  td {
+    padding: 2.5mm 4mm 2.5mm 0;
+    border-bottom: 0.5pt solid var(--rule);
+    vertical-align: top;
+  }
+  td:first-child { font-family: "DejaVu Sans", sans-serif; font-weight: bold; width: 38%; }
+  .num { font-family: "DejaVu Sans Mono", monospace; white-space: nowrap; }
+  td.note { color: var(--ink-soft); font-size: 8.8pt; }
+  th:last-child, td:last-child { padding-right: 0; }
+
+  .closing {
+    margin-top: 8mm;
+    padding-top: 4mm;
+    border-top: 1.5pt solid var(--ink);
+    font-size: 10pt;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    max-width: 130mm;
+    page-break-inside: avoid;
+  }
+</style>
+</head>
+<body>
+
+<!-- ======================= COVER ======================= -->
+<div class="cover">
+  <div class="kicker">Handbook</div>
+  <h1>The Monograph<br>System</h1>
+  <p class="lede">
+    One place where a department manages every final-year monograph: from the
+    first idea a student writes down, to the day the finished work is defended,
+    graded and shelved in the archive.
+  </p>
+  <p class="lede" style="font-size:10pt">
+    This explains what you do in it, whoever you are.
+  </p>
+  <hr>
+  <div class="who">
+    <b>Students</b> — propose a topic, upload work, read feedback<br>
+    <b>Supervisors</b> — review submissions and guide students<br>
+    <b>Heads of department</b> — approve topics, assign supervisors, run defences<br>
+    <b>Committee members</b> — examine monographs and enter scores<br>
+    <b>Administrators</b> — accounts, academic years, department rules
+  </div>
+  <div class="foot">
+    Keep this where staff and students can find it.
+  </div>
+</div>
+
+<!-- ======================= SIGNING IN ======================= -->
+<div class="section">
+  <p class="label">Before anything else</p>
+  <h2>Signing in</h2>
+  <p class="intro">
+    Go to the address your department gave you. Everyone uses the same page.
+  </p>
+
+  <div class="signin">
+    <div class="signin-row">
+      <dt>Username</dt>
+      <dd>Your university ID
+        <span>Students use their student number, staff their staff number.
+          Never an email address.</span>
+      </dd>
+    </div>
+    <div class="signin-row">
+      <dt>Password</dt>
+      <dd>From the administrator
+        <span>The system sends no email, so there is no reset link. Ask them
+          directly if you forget it.</span>
+      </dd>
+    </div>
+    <div class="signin-row">
+      <dt>Once you are in</dt>
+      <dd>Three controls, top right
+        <span>The moon or sun switches light and dark. The bell shows what is new.
+          Your name opens your profile and sign out.</span>
+      </dd>
+    </div>
+  </div>
+
+  <div class="aside">
+    <b>Two people on one computer?</b> Open a second browser tab. Each tab holds
+    its own login, so a supervisor and a student can work side by side. Closing a
+    tab ends that tab's session, which is what you want on a shared machine.
+  </div>
+</div>
+
+<!-- ======================= THE JOURNEY ======================= -->
+<div class="section">
+  <p class="label">The spine of everything</p>
+  <h2>How a monograph travels</h2>
+  <p class="intro">
+    Thirteen stages, always in this order. A monograph cannot skip one, and it
+    cannot move backwards without a reason being written down. Whoever is named
+    beside a stage is the only person who can move it on from there.
+  </p>
+
+  <div class="stage" style="color:#7a8a90">
+    <div class="pip">1</div>
+    <p class="stage-name">Draft</p>
+    <p class="stage-meta"><span class="actor">Student</span>
+      writes the idea down. Nothing is official and every word can still change.</p>
+  </div>
+
+  <div class="stage" style="color:#b06d06">
+    <div class="pip">2</div>
+    <p class="stage-name">Topic submitted</p>
+    <p class="stage-meta"><span class="actor">Student</span>
+      sends it to the department. It locks now.
+      <span class="needs">Needs a title and a research area.</span></p>
+  </div>
+
+  <div class="stage" style="color:#17703f">
+    <div class="pip">3</div>
+    <p class="stage-name">Topic approved</p>
+    <p class="stage-meta"><span class="actor">Head of Dept</span>
+      accepts the topic and the student learns who will supervise them.
+      <span class="needs">Needs a supervisor assigned first.</span></p>
+  </div>
+
+  <div class="stage" style="color:#b06d06">
+    <div class="pip">4</div>
+    <p class="stage-name">Proposal submitted</p>
+    <p class="stage-meta"><span class="actor">Student</span>
+      writes the full proposal and sends it to their supervisor.
+      <span class="needs">Needs the proposal file uploaded.</span></p>
+  </div>
+
+  <div class="stage" style="color:#1d5fc4">
+    <div class="pip">5</div>
+    <p class="stage-name">Under review</p>
+    <p class="stage-meta"><span class="actor">Supervisor</span>
+      is reading it. The student can see that, instead of wondering.</p>
+  </div>
+
+  <div class="stage" style="color:#c25410">
+    <div class="pip">6</div>
+    <p class="stage-name">Revision required</p>
+    <p class="stage-meta"><span class="actor">Supervisor</span>
+      sends it back with corrections.
+      <span class="needs">Needs a written explanation.</span></p>
+  </div>
+
+  <div class="loopnote">
+    <b>This is a loop.</b> The student fixes the work and submits again, which
+    returns it to stage 4. It can go round as many times as the work needs, and
+    every round is kept: round one and round two both stay readable years later.
+  </div>
+
+  <div class="stage" style="color:#17703f">
+    <div class="pip">7</div>
+    <p class="stage-name">Proposal approved</p>
+    <p class="stage-meta"><span class="actor">Supervisor</span>
+      is satisfied. The research may begin.</p>
+  </div>
+
+  <div class="stage" style="color:#1d5fc4">
+    <div class="pip">8</div>
+    <p class="stage-name">Research in progress</p>
+    <p class="stage-meta"><span class="actor">Student</span>
+      does the work and uploads chapters as they are finished. Each chapter can be
+      reviewed the same way the proposal was.</p>
+  </div>
+
+  <div class="stage" style="color:#b06d06">
+    <div class="pip">9</div>
+    <p class="stage-name">Final submission</p>
+    <p class="stage-meta"><span class="actor">Student</span>
+      uploads the complete monograph.
+      <span class="needs">Needs the final file uploaded.</span></p>
+  </div>
+
+  <div class="stage" style="color:#1d5fc4">
+    <div class="pip">10</div>
+    <p class="stage-name">Final review</p>
+    <p class="stage-meta"><span class="actor">Supervisor</span>
+      reads the whole work and decides whether it is ready to defend. If not, it
+      goes back to stage 8.</p>
+  </div>
+
+  <div class="stage" style="color:#6a3fb5">
+    <div class="pip">11</div>
+    <p class="stage-name">Defence scheduled</p>
+    <p class="stage-meta"><span class="actor">Head of Dept</span>
+      sets the date and place and appoints the committee. Everyone is notified.
+      <span class="needs">Needs a full committee.</span></p>
+  </div>
+
+  <div class="stage" style="color:#6a3fb5">
+    <div class="pip">12</div>
+    <p class="stage-name">Defended</p>
+    <p class="stage-meta"><span class="actor">Head of Dept</span>
+      closes the defence once every examiner has entered a score.
+      <span class="needs">Needs all scores in.</span></p>
+  </div>
+
+  <div class="stage" style="color:#17703f">
+    <div class="pip">13</div>
+    <p class="stage-name">Completed</p>
+    <p class="stage-meta"><span class="actor">Head of Dept</span>
+      records the grade and the monograph joins the department's permanent archive.
+      <span class="needs">Needs a final grade.</span></p>
+  </div>
+
+  <div class="endings">
+    <div class="ending">
+      <h3>Rejected</h3>
+      <p>The work cannot continue in this form. Only the head of department can do
+        this, and only with a written reason.</p>
+    </div>
+    <div class="ending">
+      <h3>Withdrawn</h3>
+      <p>The student steps away from the topic. Available up until a defence is
+        scheduled, again only with a written reason.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= STUDENT ======================= -->
+<div class="section">
+  <p class="label">For students</p>
+  <h2>What you do</h2>
+  <p class="intro">
+    Your first screen answers one question: where am I? A ring shows how far you
+    have come, and a track marks the stage you are standing on.
+  </p>
+
+  <div class="task">
+    <h3>Propose your topic <span class="where">Monographs &rarr; Propose a topic</span></h3>
+    <p>Fill in a working title, choose a research area, and describe what you want
+      to do. It saves as a <b>draft</b>, and a draft is yours alone: you can change
+      every word.</p>
+    <p>When you are ready, open your monograph and choose
+      <b>Topic submitted for approval</b>. Only then does the department see it,
+      and only then does it lock.</p>
+  </div>
+
+  <div class="task">
+    <h3>Upload your work <span class="where">Open monograph &rarr; Documents &rarr; Upload a file</span></h3>
+    <p>Say what the file is, pick it, and upload. For a chapter, give its number.</p>
+    <div class="aside">
+      <b>Uploading again never replaces anything.</b> Your second upload becomes
+      version 2 and version 1 stays exactly where it was. Write a line in
+      <i>What changed?</i> — your supervisor sees it and it saves them re-reading
+      the whole thing.
+    </div>
+  </div>
+
+  <div class="task">
+    <h3>Read your feedback <span class="where">Open monograph &rarr; Feedback</span></h3>
+    <p>Every review you have ever been given, oldest first, so the sequence reads
+      like a conversation.</p>
+    <p>Where your supervisor pinned a correction to a page, you can <b>tick it
+      off</b> as you deal with it. They can see what you have done.</p>
+  </div>
+
+  <div class="task">
+    <h3>Move forward</h3>
+    <p>The buttons on your monograph are exactly the moves you can make right now.
+      If a button you expect is missing, something is not ready — usually a file you
+      have not uploaded, or your supervisor has not answered yet.</p>
+    <p>The system tells you which when you try, in a sentence, not an error code.</p>
+  </div>
+
+  <div class="task">
+    <h3>Your defence</h3>
+    <p>Once your supervisor accepts your final monograph, the head of department
+      sets a date and appoints examiners. It appears on your first screen and the
+      bell tells you. Afterwards you see your result and your final grade.</p>
+  </div>
+</div>
+
+<!-- ======================= SUPERVISOR ======================= -->
+<div class="section">
+  <p class="label">For supervisors</p>
+  <h2>What you do</h2>
+  <p class="intro">
+    Your first screen answers a different question: what needs me today? It lists
+    students waiting on you, longest wait first, because that is the fairest order
+    to work through them.
+  </p>
+
+  <div class="task">
+    <h3>See what is waiting <span class="where">Dashboard, or Reviews</span></h3>
+    <p>The dashboard also flags students who have <b>gone quiet</b> — no progress
+      for a month or more. That is usually the more urgent problem, because nobody
+      else is watching for it.</p>
+  </div>
+
+  <div class="task">
+    <h3>Review a submission <span class="where">Open monograph &rarr; Feedback &rarr; Write a review</span></h3>
+    <p>Pick one of three answers:</p>
+
+    <div class="decision" style="color:#17703f">
+      <b>Approve</b>
+      <span>The work is satisfactory. The monograph moves on by itself.</span>
+    </div>
+    <div class="decision" style="color:#c25410">
+      <b>Request revisions</b>
+      <span>Say what must change. The system will not let you send this without an
+        explanation.</span>
+    </div>
+    <div class="decision" style="color:#b32626">
+      <b>Reject</b>
+      <span>The work cannot continue in this form. Also requires a reason.</span>
+    </div>
+
+    <p>Add <b>specific corrections</b> pinned to a page wherever you can. A numbered
+      list is far easier for a student to work through than a paragraph, and you can
+      see which ones they have dealt with.</p>
+    <div class="aside">
+      A review is permanent. Nothing in the system can edit or delete it afterwards
+      — not you, not the head of department, not the administrator. That protects
+      you as much as the student.
+    </div>
+  </div>
+
+  <div class="task">
+    <h3>Check whether corrections were applied <span class="where">Documents &rarr; expand a document</span></h3>
+    <p>Any document with more than one version can be compared. You see both
+      versions, what the student said they changed, and the feedback you gave
+      between them — so you need not remember what you asked for six weeks ago.</p>
+  </div>
+
+  <div class="task">
+    <h3>Approve a chapter on its own</h3>
+    <p>You can accept chapter two while the work as a whole is still in progress.
+      If the student later uploads a correction to an approved document, the
+      approval is withdrawn automatically. It is a different file now.</p>
+  </div>
+</div>
+
+<!-- ======================= HEAD OF DEPARTMENT ======================= -->
+<div class="section">
+  <p class="label">For heads of department</p>
+  <h2>What you do</h2>
+  <p class="intro">
+    Your first screen answers the questions that used to mean ringing every
+    supervisor one by one.
+  </p>
+
+  <div class="task">
+    <h3>The department at a glance <span class="where">Dashboard</span></h3>
+    <ul>
+      <li>How many students are working, and how many have finished.</li>
+      <li>How many submissions are sitting unanswered past your agreed response time.</li>
+      <li>How many students have gone quiet.</li>
+      <li>How loaded each supervisor is. Red means over their limit.</li>
+      <li>Where monographs spend the most time, which shows the real bottleneck
+        rather than the assumed one.</li>
+    </ul>
+  </div>
+
+  <div class="task">
+    <h3>Assign a supervisor <span class="where">Open monograph &rarr; Assign supervisor</span></h3>
+    <p>Each person's current load sits beside their name, so you can spread the
+      work. Anyone already at their limit is marked.</p>
+    <div class="aside">
+      You <b>can</b> still choose someone at capacity — sometimes there is no one
+      else — and the dashboard will show it in red so it is not quietly forgotten.
+    </div>
+  </div>
+
+  <div class="task">
+    <h3>Approve a topic <span class="where">Open monograph &rarr; Topic approved</span></h3>
+    <p>The system will refuse until a supervisor is assigned. That is deliberate:
+      an approved topic with nobody guiding it goes nowhere. So assign first, then
+      approve.</p>
+    <p>If the topic is unsuitable, send it back with an explanation and the student
+      can change it.</p>
+  </div>
+
+  <div class="task">
+    <h3>Schedule a defence <span class="where">Defenses &rarr; Schedule a defence</span></h3>
+    <p>Set the date, time and place, then name the committee and each person's role.
+      Your department's rules set the minimum committee size and the system will not
+      accept fewer. Everyone involved is notified at once.</p>
+  </div>
+
+  <div class="task">
+    <h3>Record the result <span class="where">Open the defence &rarr; Record the result</span></h3>
+    <p>Each examiner enters their own score; nobody can enter one for somebody else.
+      Once every score is in, you record the outcome.</p>
+    <p>The final grade is calculated from <b>your department's own weights</b>. The
+      result itself is whatever the committee decided — the arithmetic never
+      overrules the people in the room.</p>
+  </div>
+
+  <div class="task">
+    <h3>Print official forms <span class="where">Open monograph &rarr; Forms</span></h3>
+    <ul>
+      <li>Topic approval form</li>
+      <li>Supervisor assignment letter</li>
+      <li>Defence notice</li>
+      <li>Defence result sheet</li>
+    </ul>
+    <p>Each comes out with signature lines and room for the department stamp. A form
+      only becomes available once the information it carries actually exists, so
+      nobody prints a result sheet for a defence that has not happened.</p>
+  </div>
+
+  <div class="task">
+    <h3>Reports <span class="where">Reports</span></h3>
+    <p>Progress for the year, supervisor workload, where time is being lost, and
+      everyone behind schedule. <b>Export as CSV</b> gives you a spreadsheet for the
+      faculty.</p>
+  </div>
+
+  <div class="task">
+    <h3>Your department's rules <span class="where">Settings</span></h3>
+    <p>Everything that differs between departments lives here: who approves topics,
+      how supervisors are chosen, how many students one supervisor may carry,
+      committee size, how the grade is weighted, and how long is too long before the
+      system raises the alarm.</p>
+    <div class="aside">
+      Confirm these with your faculty before changing them. The two grade weights
+      must add up to 100, and the system will refuse to save if they do not.
+    </div>
+  </div>
+</div>
+
+<!-- ======================= COMMITTEE + ADMIN ======================= -->
+<div class="section">
+  <p class="label">For committee members</p>
+  <h2>What you do</h2>
+  <p class="intro">
+    Your first screen lists the monographs you have been asked to examine, with the
+    date of each defence.
+  </p>
+
+  <div class="task">
+    <h3>Before the defence</h3>
+    <p>Open the monograph, read it, then mark <b>I have read it</b>. The head of
+      department can then see who is prepared, before the day rather than on it.</p>
+  </div>
+
+  <div class="task">
+    <h3>After the defence <span class="where">Open the defence &rarr; Enter my score</span></h3>
+    <p>Enter your score out of 100 and any comments. You can change your own score
+      right up until the result is recorded, and no one else can enter a score on
+      your behalf.</p>
+  </div>
+</div>
+
+<div class="section">
+  <p class="label">For administrators</p>
+  <h2>What you do</h2>
+  <p class="intro">
+    You keep the accounts and the calendar in order. Almost everything else looks
+    after itself.
+  </p>
+
+  <div class="task">
+    <h3>Set the department up, once <span class="where">The admin site, at /admin/</span></h3>
+    <p>Order matters, because each step depends on the one before it:</p>
+    <ol>
+      <li><b>Faculty</b> — name and a short code.</li>
+      <li><b>Department</b> — its rules are on the same page. Confirm them with the
+        real head of department before anyone starts.</li>
+      <li><b>Academic year</b> — add it and mark it current.</li>
+      <li><b>Research areas</b> — the subjects the department supervises. Without at
+        least one, no student can submit a topic.</li>
+    </ol>
+  </div>
+
+  <div class="task">
+    <h3>Add people <span class="where">People &rarr; Add a person</span></h3>
+    <p>Set their university ID, name, role and department. Students also need a
+      student ID. Email is optional and is never needed to sign in.</p>
+    <div class="aside">
+      <b>The department is not optional.</b> An account without one cannot propose,
+      supervise or approve anything, because all of those are scoped to a department
+      — and nothing on screen would explain why.
+    </div>
+  </div>
+
+  <div class="task">
+    <h3>Reset a password <span class="where">People &rarr; the key icon</span></h3>
+    <p>Set a new one and tell the person directly. The system sends no email, by
+      design: many students do not use it.</p>
+  </div>
+
+  <div class="task">
+    <h3>Never delete an account</h3>
+    <p><b>Deactivate</b> it instead. A graduated student's name must still appear on
+      their archived monograph. Deactivating stops them signing in and changes
+      nothing else.</p>
+  </div>
+
+  <div class="task">
+    <h3>The archive <span class="where">Archive</span></h3>
+    <p>Finished monographs arrive here on their own. Anyone signed in can search by
+      title, author, supervisor or keyword. This is what future students read
+      instead of starting from nothing every year.</p>
+  </div>
+</div>
+
+<!-- ======================= QUESTIONS ======================= -->
+<div class="section">
+  <p class="label">Asked often</p>
+  <h2>Questions</h2>
+
+  <div class="qa">
+    <h3>Why can I not press a button I expect?</h3>
+    <p>Something is not ready. Usually a file has not been uploaded, or a supervisor
+      has not been assigned. The system names the missing piece when you try.</p>
+  </div>
+
+  <div class="qa">
+    <h3>I uploaded the wrong file.</h3>
+    <p>Upload the right one. It becomes a new version, and the wrong one stays in
+      the history rather than pretending it never happened.</p>
+  </div>
+
+  <div class="qa">
+    <h3>Can I delete something?</h3>
+    <p>No, and that is the point. Nothing is ever removed, which is what makes the
+      record worth trusting for everybody — including you.</p>
+  </div>
+
+  <div class="qa">
+    <h3>Can two students write one monograph together?</h3>
+    <p>If your department allows it. It is one of the settings a head of department
+      controls, so ask them.</p>
+  </div>
+
+  <div class="qa">
+    <h3>The page is not updating.</h3>
+    <p>It usually updates by itself as other people act. On a weak connection,
+      reload the page — nothing is lost.</p>
+  </div>
+
+  <div class="qa">
+    <h3>I cannot see another student's monograph.</h3>
+    <p>You are not meant to. Student work is private to the student, their
+      supervisor, the head of department and their defence committee. To anyone else
+      it does not appear to exist at all.</p>
+  </div>
+</div>
+
+<!-- ======================= REFERENCE ======================= -->
+<div class="section">
+  <p class="label">For reference</p>
+  <h2>The rules your department sets</h2>
+  <p class="intro">
+    These are the settings that differ between departments. The values shown are the
+    starting points; a head of department confirms and changes them in Settings.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>Rule</th><th>Starts at</th><th>What it governs</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Committee size</td><td class="num">3</td>
+        <td class="note">A defence cannot be scheduled with fewer members.</td></tr>
+      <tr><td>Grade weighting</td><td class="num">40 / 60</td>
+        <td class="note">Supervisor's mark, then the committee average. Must total 100.</td></tr>
+      <tr><td>Passing grade</td><td class="num">60</td>
+        <td class="note">Below this, the suggested result is a fail.</td></tr>
+      <tr><td>Students per supervisor</td><td class="num">10</td>
+        <td class="note">An individual limit can be set on a supervisor's own profile.</td></tr>
+      <tr><td>Supervisor response time</td><td class="num">7 days</td>
+        <td class="note">Work waiting longer is flagged on the dashboard.</td></tr>
+      <tr><td>Student inactivity</td><td class="num">30 days</td>
+        <td class="note">No progress for this long and the student is flagged as gone quiet.</td></tr>
+      <tr><td>Duplicate topic threshold</td><td class="num">60%</td>
+        <td class="note">Topics scoring above this against past work are flagged for the head.</td></tr>
+      <tr><td>Group monographs</td><td class="num">Allowed</td>
+        <td class="note">Whether two students may share one monograph, and how many at most.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="closing">
+    Everything a student submits is kept, and every action is recorded with who did
+    it and when, in a history that nothing in the system can rewrite. That is the
+    quiet point of all of it: arguments about whether work was handed in on time, or
+    whether corrections were ever given, simply end. The record is there, and both
+    sides can read it.
+  </p>
+</div>
+
+</body>
+</html>
